@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex - Games</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#121212;
+color:white;
+overflow-x:hidden;
+}
+
+/* PARTICLE CANVAS */
+
+#particles{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+position:fixed;
+left:0;
+top:0;
+height:100%;
+width:70px;
+background:#0f0f0f;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding-top:20px;
+gap:15px;
+box-shadow:5px 0 15px rgba(0,0,0,0.6);
+}
+
+.sidebar button{
+width:45px;
+height:45px;
+border-radius:12px;
+border:none;
+background:#1f1f1f;
+color:white;
+cursor:pointer;
+font-size:18px;
+transition:.2s;
+}
+
+.sidebar button:hover{
+background:#5865f2;
+transform:scale(1.1);
+}
+
+/* HEADER */
+
+header{
+margin-left:70px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 30px;
+background:linear-gradient(90deg,#141e30,#243b55);
+box-shadow:0 5px 20px rgba(0,0,0,0.5);
+position:sticky;
+top:0;
+z-index:10;
+}
+
+header h1{
+font-weight:600;
+letter-spacing:2px;
+cursor:pointer;
+}
+
+#searchBar{
+padding:10px 15px;
+border-radius:30px;
+border:none;
+width:220px;
+background:#1f1f1f;
+color:white;
+outline:none;
+transition:.2s;
+}
+
+#searchBar:focus{
+background:#2a2a2a;
+width:260px;
+}
+
+/* GAME GRID */
+
+.card-container{
+margin-left:70px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+padding:40px;
+max-width:1200px;
+}
+
+/* CARD */
+
+.card{
+background:#1c1c1c;
+border-radius:15px;
+padding:15px;
+text-align:center;
+transition:.25s;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+position:relative;
+overflow:hidden;
+}
+
+/* animated glow */
+
+.card::before{
+content:"";
+position:absolute;
+width:200%;
+height:200%;
+background:linear-gradient(45deg,transparent,#00c6ff,transparent);
+top:-50%;
+left:-50%;
+animation:spin 6s linear infinite;
+opacity:.2;
+}
+
+@keyframes spin{
+0%{transform:rotate(0deg)}
+100%{transform:rotate(360deg)}
+}
+
+.card:hover{
+transform:translateY(-10px) scale(1.05);
+box-shadow:0 20px 45px rgba(0,0,0,0.7);
+}
+
+.card img{
+width:100%;
+height:130px;
+object-fit:cover;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.card h2{
+font-size:18px;
+margin-bottom:10px;
+}
+
+.card button{
+padding:10px 20px;
+border:none;
+border-radius:30px;
+background:linear-gradient(45deg,#007bff,#00c6ff);
+color:white;
+font-size:15px;
+cursor:pointer;
+transition:.2s;
+}
+
+.card button:hover{
+transform:scale(1.1);
+}
+
+/* IFRAME */
+
+.iframe-container{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:99999;
+}
+
+.iframe-container iframe{
+width:90%;
+height:85%;
+border:none;
+border-radius:10px;
+box-shadow:0 10px 40px black;
+}
+
+/* GAME CONTROLS */
+
+.controls{
+position:absolute;
+top:15px;
+right:20px;
+display:flex;
+gap:10px;
+}
+
+.controls button{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+font-size:14px;
+cursor:pointer;
+}
+
+.close-button{
+background:#ff3b3b;
+color:white;
+}
+
+.fullscreen-button{
+background:#2ecc71;
+color:white;
+}
+
+/* CATEGORY LABEL */
+
+.category{
+margin-left:70px;
+font-size:20px;
+padding-left:40px;
+margin-top:30px;
+opacity:.7;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar{
+width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+background:#444;
+border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+background:#666;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+<button onclick="filterCategory('all')">all</button>
+<button onclick="filterCategory('minecraft')"></button>
+<button onclick="filterCategory('arcade')">️Games</button>
+<button onclick="filterCategory('tools')">Proxys</button>
+</div>
+
+<header>
+<h1 onclick="filterCategory('all')">Codex</h1>
+<input type="text" id="searchBar" placeholder="Search games...">
+</header>
+
+<div class="card-container" id="cardContainer">
+
+<div class="card" data-category="arcade" data-title="sand smoke">
+<img src="https://dummyimage.com/300x200/444/fff&text=SandSmoke">
+<h2>SandSmoke 3XP</h2>
+<button onclick="playGame('https://sand-smoke-proxy.vercel.app/sand/')">Play</button>
+</div>
+
+<div class="card" data-category="arcade" data-title="truffled">
+<img src="https://dummyimage.com/300x200/444/fff&text=Truffled">
+<h2>Truffled.lol</h2>
+<button onclick="playGame('https://truffled.lol/')">Play</button>
+</div>
+
+<div class="card" data-category="tools" data-title="fern">
+<img src="https://dummyimage.com/300x200/444/fff&text=FernIsBest">
+<h2>FernIsBest</h2>
+<button onclick="playGame('https://s3.amazonaws.com/fernisbest/')">Play</button>
+</div>
+
+<div class="card" data-category="arcade" data-title="froggies arcade">
+<img src="https://dummyimage.com/300x200/444/fff&text=Froggiesarcade.win">
+<h2>Froggie's Arcade</h2>
+<button onclick="playGame('https://frogiesarcade.win/')">Play</button>
+</div>
+
+<div class="card" data-category="minecraft" data-title="minecraft">
+<img src="https://dummyimage.com/300x200/444/fff&text=Minecraft">
+<h2>Minecraft Web Edition</h2>
+<button onclick="playGame('https://mcraft.fun')">Play</button>
+</div>
+
+<div class="card" data-category="tools" data-title="mangomath">
+<img src="https://dummyimage.com/300x200/444/fff&text=2xM">
+<h2>MangoMath</h2>
+<button onclick="playGame('https://2xm-yk-who-it-is_bs.oneapp.dev/')">Play</button>
+</div>
+
+</div>
+
+<div class="iframe-container" id="iframeContainer">
+
+<div class="controls">
+<button class="fullscreen-button" onclick="fullscreenGame()">Fullscreen</button>
+<button class="close-button" onclick="closeGame()">Close</button>
+</div>
+
+<iframe id="gameIframe"></iframe>
+
+</div>
+
+<script>
+
+/* SEARCH */
+
+document.getElementById('searchBar').addEventListener('input', function(){
+
+const searchQuery=this.value.toLowerCase()
+const cards=document.querySelectorAll('.card')
+
+cards.forEach(card=>{
+
+const title=card.getAttribute('data-title').toLowerCase()
+
+card.style.display = title.includes(searchQuery) ? "block" : "none"
+
+})
+
+})
+
+/* CATEGORY FILTER */
+
+function filterCategory(cat){
+
+const cards=document.querySelectorAll(".card")
+
+cards.forEach(card=>{
+
+if(cat==="all"){
+card.style.display="block"
+}else{
+card.style.display =
+card.dataset.category===cat ? "block":"none"
+}
+
+})
+
+}
+
+/* PLAY GAME */
+
+function playGame(url){
+
+document.getElementById("gameIframe").src=url
+document.getElementById("iframeContainer").style.display="flex"
+
+}
+
+/* CLOSE */
+
+function closeGame(){
+
+document.getElementById("gameIframe").src=""
+document.getElementById("iframeContainer").style.display="none"
+
+}
+
+document.addEventListener("keydown",function(e){
+if(e.key==="Escape"){
+closeGame()
+}
+})
+
+/* FULLSCREEN */
+
+function fullscreenGame(){
+
+const container=document.getElementById("iframeContainer")
+
+if(container.requestFullscreen){
+container.requestFullscreen()
+}else if(container.webkitRequestFullscreen){
+container.webkitRequestFullscreen()
+}else if(container.msRequestFullscreen){
+container.msRequestFullscreen()
+}
+
+}
+
+/* PARTICLES */
+
+const canvas=document.getElementById("particles")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let particles=[]
+
+for(let i=0;i<80;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+dx:(Math.random()-0.5)*0.5,
+dy:(Math.random()-0.5)*0.5
+})
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+particles.forEach(p=>{
+
+ctx.beginPath()
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2)
+ctx.fillStyle="white"
+ctx.fill()
+
+p.x+=p.dx
+p.y+=p.dy
+
+})
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+/* PROXY CLOAK */
+
+function cloak(){
+
+document.title="Google Classroom"
+
+const link=document.querySelector("link[rel='icon']") || document.createElement("link")
+
+link.rel="icon"
+link.href="https://ssl.gstatic.com/classroom/favicon.png"
+
+document.head.appendChild(link)
+
+}
+
+cloak()
+
+</script>
+
+</body>
+</html>
